@@ -46,11 +46,11 @@ function add(){
     let r = document.getElementById('remove');
     points++;
     let x = document.createElement("input");
-    x.className = "x " + points.toString();
+    x.className = "p x " + points.toString();
     x.size = "4";
     x.setAttribute("onchange", "graph();");
     let y = document.createElement("input");
-    y.className = "y " + points.toString();
+    y.className = "p y " + points.toString();
     y.size = "4";
     y.setAttribute("onchange", "graph();");
     let c = document.createElement("span");
