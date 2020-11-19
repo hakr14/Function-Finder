@@ -79,18 +79,21 @@ function graph(){
     let types = document.getElementsByName("type");
     let t = "polynomial";
     for(let i = 0; i < types.length; i++){
-        console.log(i);
-        console.log(types[i].value);
         if(types[i].checked){
             t = types[i].value;
             break;
         }
     }
-    let func = window[t](getPoints());
+    let points = getPoints();
+    let l = [];
+    for(let p of points)
+        l.push([math.number(p.x), math.number(p.y)]);
+    let func = window[t](points);
     document.getElementById("func").innerHTML = func;
     functionPlot({
         target: "#graph",
         data: [{
+            points: l,
             fn: func,
             sampler: "builtIn",
             graphType: "polyline"
