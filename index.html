@@ -16,8 +16,8 @@
             <tr>
                 <td>
                     <form id="points">
-                    <button class="values" onclick="event.preventDefault();add();"><b>+</b></button><br>
-                    <button class="values" id="remove" type="button" onclick="remove();"><b>-</b></button>
+                    <button class="values" onclick="event.preventDefault();add();graph();"><b>+</b></button><br>
+                    <button class="values" id="remove" type="button" onclick="remove();graph();"><b>-</b></button>
                     </form>
                 </td>
                 <td id="t">
@@ -28,6 +28,7 @@
     <div id="func"></div>
     <div id="graph"></div>
     <script>
+        add();
         add();
         graph();
     </script>

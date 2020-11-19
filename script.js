@@ -49,10 +49,12 @@ function add(){
     x.className = "p x " + points.toString();
     x.size = "4";
     x.setAttribute("onchange", "graph();");
+    x.setAttribute("value", points-1);
     let y = document.createElement("input");
     y.className = "p y " + points.toString();
     y.size = "4";
     y.setAttribute("onchange", "graph();");
+    y.setAttribute("value", points-1);
     let c = document.createElement("span");
     c.innerHTML = ", ";
     let s = document.createElement("span");
@@ -67,7 +69,7 @@ function add(){
 
 function remove(){
     let form = document.getElementById('points');
-    if(points>1){
+    if(points>2){
         let s = document.getElementsByClassName("point " + points.toString())[0];
         form.removeChild(s);
         points--;
@@ -93,10 +95,14 @@ function graph(){
     functionPlot({
         target: "#graph",
         data: [{
-            points: l,
             fn: func,
             sampler: "builtIn",
             graphType: "polyline"
+        },
+        { 
+            points: l,
+            fnType: "points",
+            graphType: "scatter"
         }]
     });
 }
