@@ -43,37 +43,33 @@ var points = 0;
 
 function add(){
     let form = document.getElementById('points');
-    let r = document.getElementById('remove');
+    let a = document.getElementById('plus');
     points++;
     let x = document.createElement("input");
-    x.className = "p x " + points.toString();
+    x.className = "p x";
     x.size = "4";
     x.setAttribute("onchange", "graph();");
-    x.setAttribute("value", points-1);
+    x.setAttribute("value", points);
     let y = document.createElement("input");
-    y.className = "p y " + points.toString();
+    y.className = "p y";
     y.size = "4";
     y.setAttribute("onchange", "graph();");
-    y.setAttribute("value", points-1);
+    y.setAttribute("value", points);
     let c = document.createElement("span");
     c.innerHTML = ", ";
+    let r = document.createElement("button");
+    r.className = "values remove";
+    r.setAttribute("type", "button");
+    r.setAttribute("onclick", "document.getElementById('points').removeChild(this.parentElement);points--;check();graph();");
+    r.innerHTML = "<b>-</b>";
     let s = document.createElement("span");
-    s.className = "point " + points.toString();
+    s.className = "point";
     s.appendChild(x);
     s.appendChild(c);
     s.appendChild(y);
+    s.appendChild(r);
     s.appendChild(document.createElement("br"));
-    form.insertBefore(s, r);
-    check();
-}
-
-function remove(){
-    let form = document.getElementById('points');
-    if(points>2){
-        let s = document.getElementsByClassName("point " + points.toString())[0];
-        form.removeChild(s);
-        points--;
-    }
+    form.insertBefore(s, a);
     check();
 }
 
@@ -109,7 +105,7 @@ function graph(){
 
 function getPoints(){
     let pl = document.getElementsByClassName("point");
-    let l = []
+    let l = [];
     for(let s of pl){
         let x = s.getElementsByClassName("x")[0].value;
         if(x==="")
@@ -184,8 +180,18 @@ function check(){
         l.innerHTML = "Logarithmic";
         types.appendChild(t);
         types.appendChild(l);
+        
+        for(let r of document.getElementsByClassName("remove")){
+            r.disabled = true;
+            r.style.visibility = "hidden";
+        }
+    }else{
+        for(let r of document.getElementsByClassName("remove")){
+            r.disabled = false;
+            r.style.visibility = "visible";
+        }
+        //TODO: more types
     }
-    //TODO: more types
     let s = document.getElementById(prev);
     if(s==null){
         s = document.getElementById("polynomial");
