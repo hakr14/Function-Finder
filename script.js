@@ -48,12 +48,12 @@ function add(){
     let x = document.createElement("input");
     x.className = "p x";
     x.size = "4";
-    x.setAttribute("onchange", "graph();");
+    x.setAttribute("onchange", "check();graph();");
     x.setAttribute("value", points);
     let y = document.createElement("input");
     y.className = "p y";
     y.size = "4";
-    y.setAttribute("onchange", "graph();");
+    y.setAttribute("onchange", "check();graph();");
     y.setAttribute("value", points);
     let c = document.createElement("span");
     c.innerHTML = ", ";
@@ -118,7 +118,6 @@ function getPoints(){
     return l;
 }
 
-// NO NEGATIVE X
 function logarithmic(points){
     let p1 = points[0];
     let p2 = points[1];
@@ -127,7 +126,6 @@ function logarithmic(points){
     return a.toString() + "*log(" + b.toString() + "*x)";
 }
 
-// Y1 and Y2 MUST have same sign
 function exponential(points){
     let p1 = points[0];
     let p2 = points[1];
@@ -157,29 +155,37 @@ function check(){
         types.appendChild(l);
     }
     if(points==2){
-        let t = document.createElement("input");
-        t.setAttribute("type", "radio");
-        t.setAttribute("id", "exponential");
-        t.setAttribute("name", "type");
-        t.setAttribute("value", "exponential");
-        t.setAttribute("onchange", "graph();");
-        let l = document.createElement("label");
-        l.setAttribute("for", "exponential");
-        l.innerHTML = "Exponential";
-        types.appendChild(t);
-        types.appendChild(l);
+        let p = getPoints();
+        let p1 = p[0];
+        let p2 = p[1];
         
-        t = document.createElement("input");
-        t.setAttribute("type", "radio");
-        t.setAttribute("id", "logarithmic");
-        t.setAttribute("name", "type");
-        t.setAttribute("value", "logarithmic");
-        t.setAttribute("onchange", "graph();");
-        l = document.createElement("label");
-        l.setAttribute("for", "logarithmic");
-        l.innerHTML = "Logarithmic";
-        types.appendChild(t);
-        types.appendChild(l);
+        if(math.equal(math.sign(p1.y), math.sign(p2.y))&&!math.equal(p1.y,0)&&!math.equal(p2.y,0)){
+            let t = document.createElement("input");
+            t.setAttribute("type", "radio");
+            t.setAttribute("id", "exponential");
+            t.setAttribute("name", "type");
+            t.setAttribute("value", "exponential");
+            t.setAttribute("onchange", "graph();");
+            let l = document.createElement("label");
+            l.setAttribute("for", "exponential");
+            l.innerHTML = "Exponential";
+            types.appendChild(t);
+            types.appendChild(l);
+        }
+        
+        if(math.equal(math.add(math.compare(p1.x,0), math.compare(p2.x,0)), 2)){
+            t = document.createElement("input");
+            t.setAttribute("type", "radio");
+            t.setAttribute("id", "logarithmic");
+            t.setAttribute("name", "type");
+            t.setAttribute("value", "logarithmic");
+            t.setAttribute("onchange", "graph();");
+            l = document.createElement("label");
+            l.setAttribute("for", "logarithmic");
+            l.innerHTML = "Logarithmic";
+            types.appendChild(t);
+            types.appendChild(l);
+        }
         
         for(let r of document.getElementsByClassName("remove")){
             r.disabled = true;
