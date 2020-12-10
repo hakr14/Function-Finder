@@ -20,23 +20,39 @@ function polynomial(points){
     }
     let s = math.flatten(math.multiply(math.inv(a), b));
     let d = s.length-1;
+    let m = "";
     let r = "";
     for(const c of s){
         if(math.unequal(c,0)){
             if(math.unequal(c,1)){
                 r += "+";
                 r += "(" + math.format(c, {format: "ratio"}) + ")";
-            }else if(d==0)
+                if(math.smaller(c, 0)){
+                    m += "-";
+                }else{
+                    if(d!=s.length-1)
+                        m += "+";
+                }
+                if(c.d!=1)
+                    m += "\\frac{" + math.abs(c.n) + "}{" + math.abs(c.d) + "}";
+                else
+                    m += math.abs(c.n);
+            }else if(d==0){
                 r += "+1";
+                m += "+1";
+            }
             if(d!=0){
                 r += "x";
-                if(d!=1)
+                m += "x";
+                if(d!=1){
                     r += "^" + d;
+                    m += "^{" + d + "}";
+                }
             }
         }
         d--;
     }
-    return r;
+    return [m, r];
 }
 
 var points = 0;
@@ -87,11 +103,11 @@ function graph(){
     for(let p of points)
         l.push([math.number(p.x), math.number(p.y)]);
     let func = window[t](points);
-    document.getElementById("func").innerHTML = func;
+    document.getElementById("func").innerHTML = "$$" + func[0] + "$$";
     functionPlot({
         target: "#graph",
         data: [{
-            fn: func,
+            fn: func[1],
             sampler: "builtIn",
             graphType: "polyline"
         },
@@ -101,6 +117,7 @@ function graph(){
             graphType: "scatter"
         }]
     });
+    MathJax.typeset();
 }
 
 function getPoints(){
@@ -121,9 +138,75 @@ function getPoints(){
 function logarithmic(points){
     let p1 = points[0];
     let p2 = points[1];
-    let a = (p1.y - p2.y) / (math.log(math.bignumber(p1.x)) - math.log(math.bignumber(p2.x)));
-    let b = math.exp((p2.y*math.log(math.bignumber(p1.x))-p1.y*math.log(math.bignumber(p2.x)))/(p1.y-p2.y));
-    return a.toString() + "*log(" + b.toString() + "*x)";
+    let a1 = math.subtract(p1.y, p2.y);
+    let a2 = math.divide(p1.x, p2.x);
+    let a = math.divide(math.bignumber(a1), math.log(math.bignumber(a2)));
+    let bd = math.subtract(p1.y, p2.y);
+    let b = math.exp((p2.y*math.log(math.bignumber(p1.x))-p1.y*math.log(math.bignumber(p2.x)))/bd);
+    let r = a.toString() + "*log(" + b.toString() + "*x)";
+    let m = "\\frac{" + a1.n + "}{"
+    if(a1.d!=1)
+        m += a1.d;
+    if(a1.s==-1)
+        a2 = math.inv(a2);
+    m += "\\ln\\left(";
+    if(a2.d!=1)
+        m += "\\frac{" + a2.n + "}{" + a2.d + "}";
+    else
+        m += a2.n;
+    m += "\\right)}";
+    let bs;
+    if(math.isInteger(b))
+        bs = b.toString();
+    else{
+        bs = "e^{";
+        let x, y, z, w;
+        if(p1.x.s==-1)
+            x = "-";
+        else
+            x = "";
+        if(math.isInteger(p1.x))
+            x += p1.x.n.toString();
+        else
+            x += "\\frac{" + p1.x.n + "}{" + p1.x.d + "}";
+        if(math.isInteger(p1.y))
+            y = p1.y.n.toString();
+        else
+            y = "\\frac{" + p1.y.n + "}{" + p1.y.d + "}";
+        if(p2.x.s==-1)
+            z = "-";
+        else
+            z = "";
+        if(math.isInteger(p2.x))
+            z += p2.x.n.toString();
+        else
+            z += "\\frac{" + p2.x.n + "}{" + p2.x.d + "}";
+        if(p2.y.s==-1)
+            w = "-";
+        else
+            w = "";
+        if(math.isInteger(p2.y))
+            w += p2.y.n.toString();
+        else
+            w += "\\frac{" + p2.y.n + "}{" + p2.y.d + "}";
+        let bn = w + "\\ln\\left(" + x + "\\right)";
+        if(p1.y.s==-1)
+            bn += "+";
+        else
+            bn += "-";
+        bn += y + "\\ln\\left(" + z + "\\right)"
+        if(bd.s==-1){
+            bs += "-";
+            bd = math.abs(bd);
+        }
+        if(math.equal(bd, 1))
+            bs += bn;
+        else
+            bs += "\\frac{" + bn + "}{" + math.abs(bd) + "}";
+        bs += "}";
+    }
+    m += "\\ln\\left(" + bs + "x\\right)";
+    return [m, r];
 }
 
 function exponential(points){
@@ -131,7 +214,8 @@ function exponential(points){
     let p2 = points[1];
     let b = math.nthRoot(math.bignumber(p1.y)/math.bignumber(p2.y), math.bignumber(p1.x)-math.bignumber(p2.x));
     let a = math.bignumber(p1.y)/math.pow(math.bignumber(b),math.bignumber(p1.x));
-    return a.toString() + "*" + b.toString() + "^x";
+    let r = a.toString() + "*" + b.toString() + "^x";
+    return [r, r];
 }
 
 var prev = "intentionallynonexistantid";
