@@ -103,6 +103,7 @@ function graph(){
     for(let p of points)
         l.push([math.number(p.x), math.number(p.y)]);
     let func = window[t](points);
+    console.log(func);
     document.getElementById("func").innerHTML = "$$" + func[0] + "$$";
     functionPlot({
         target: "#graph",
@@ -144,12 +145,17 @@ function logarithmic(points){
     let bd = math.subtract(p1.y, p2.y);
     let b = math.exp((p2.y*math.log(math.bignumber(p1.x))-p1.y*math.log(math.bignumber(p2.x)))/bd);
     let r = a.toString() + "*log(" + b.toString() + "*x)";
-    let m = "\\frac{" + a1.n + "}{"
+    let m = "";
+    if(a1.s==-1)
+        m += "-";
+    m += "\\frac{" + a1.n + "}{"
     if(a1.d!=1)
         m += a1.d;
     if(a1.s==-1)
         a2 = math.inv(a2);
     m += "\\ln\\left(";
+    if(a2.s==-1)
+        m += "-";
     if(a2.d!=1)
         m += "\\frac{" + a2.n + "}{" + a2.d + "}";
     else
@@ -189,21 +195,50 @@ function logarithmic(points){
             w += p2.y.n.toString();
         else
             w += "\\frac{" + p2.y.n + "}{" + p2.y.d + "}";
-        let bn = w + "\\ln\\left(" + x + "\\right)";
-        if(p1.y.s==-1)
-            bn += "+";
-        else
-            bn += "-";
-        bn += y + "\\ln\\left(" + z + "\\right)"
+        let bn = "";
+        if(x != "1" || z != "1"){
+            if(w == "1" && x == "1")
+                bn += "1";
+            else{
+                if(x!="1"){
+                    if(w!="1")
+                        bn += w;
+                    bn += "\\ln\\left(" + x + "\\right)";
+                    if(p1.y.s==-1)
+                        bn += "+";
+                }
+            }
+            if(p1.y.s==1)
+                bn += "-";
+            if(y == "1" && z == "1")
+                bn += "1";
+            else{
+                if(z!="1"){
+                    if(y!="1")
+                        bn += y;
+                    bn += "\\ln\\left(" + z + "\\right)";
+                }
+            }
+        }else
+            bn += "0";
         if(bd.s==-1){
             bs += "-";
             bd = math.abs(bd);
         }
+        let bds = "";
+        if(bd.s==-1)
+            bds += "-";
+        if(math.isInteger(bd))
+            bds += bd.n.toString();
+        else
+            bds += "\\frac{" + bd.n + "}{" + bd.d + "}";
         if(math.equal(bd, 1))
             bs += bn;
         else
-            bs += "\\frac{" + bn + "}{" + math.abs(bd) + "}";
+            bs += "\\frac{" + bn + "}{" + bds + "}";
         bs += "}";
+        if(bn=="0")
+            bs = "";
     }
     m += "\\ln\\left(" + bs + "x\\right)";
     return [m, r];
@@ -212,16 +247,77 @@ function logarithmic(points){
 function exponential(points){
     let p1 = points[0];
     let p2 = points[1];
-    let b = math.nthRoot(math.bignumber(p1.y)/math.bignumber(p2.y), math.bignumber(p1.x)-math.bignumber(p2.x));
+    let nb = math.divide(p1.y, p2.y);
+    let nr = math.subtract(p1.x, p2.x);
+    let b = math.nthRoot(math.bignumber(nb), math.bignumber(nr));
     let a = math.bignumber(p1.y)/math.pow(math.bignumber(b),math.bignumber(p1.x));
     let r = a.toString() + "*" + b.toString() + "^x";
-    return [r, r];
+    if(nr.s == -1){
+        nr = math.abs(nr);
+        nb = math.inv(nb);
+    }
+    let nbs = "";
+    if(nb.s == -1)
+        nbs = "-";
+    if(math.isInteger(nb))
+        nbs += nb.n.toString();
+    else
+        nbs += "\\frac{" + nb.n + "}{" + nb.d + "}";
+    let bs = "";
+    if(math.unequal(nr, 1)){
+        bs += "\\sqrt";
+        if(math.unequal(nr, 2)){
+            bs += "[";
+            if(math.isInteger(nr))
+                bs += nr.n.toString();
+            else
+                bs += "\\frac{" + nr.n + "}{" + nr.d + "}";
+            bs += "]";
+        }
+        bs += "{" + nbs + "}";
+    }else
+        bs += nbs;
+    let ae = p1.x;
+    let aes = "";
+    if(ae.s==-1){
+        ae = math.abs(ae);
+        aes += "-";
+    }
+    if(math.isInteger(ae))
+        aes += ae.n;
+    else
+        aes += "\\frac{" + ae.n + "}{" + ae.d + "}";
+    let an = math.multiply(p1.y, b.s);
+    let ans = "";
+    if(math.isInteger(an))
+        ans += an.n.toString();
+    else
+        ans += "\\frac{" + an.n + "}{" + an.d + "}";
+    let as = "";
+    if(an.s==-1)
+        as += "-";
+    if(math.equal(b, 1))
+        as += ans;
+    else{
+        as += "\\frac{" + ans + "}{" + bs;
+        if(math.unequal(ae, 1))
+            as += "^{" + aes + "}";
+        as += "}"
+    }
+    let m = as + "*" + bs + "^x";
+    return [m, r];
 }
 
-var prev = "intentionallynonexistantid";
-
 function check(){
-    let types = document.getElementById("types");
+    let types = document.getElementsByName("type");
+    let prev = "polynomial";
+    for(let i = 0; i < types.length; i++){
+        if(types[i].checked){
+            prev = types[i].id;
+            break;
+        }
+    }
+    types = document.getElementById("types");
     while(types.firstChild){
         types.removeChild(types.firstChild);
     }
@@ -287,5 +383,4 @@ function check(){
         s = document.getElementById("polynomial");
     }
     s.checked = true;
-    prev = s.value;
 }
