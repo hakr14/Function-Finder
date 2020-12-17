@@ -22,24 +22,24 @@ function polynomial(points){
     let d = s.length-1;
     let m = "";
     let r = "";
-    for(const c of s){
+    for(let c of s){
         if(math.unequal(c,0)){
+            if(c.s==-1){
+                m += "-";
+                r += "-";
+                c = math.abs(c);
+            }else if(d!=s.length-1)
+                m += "+";
             if(math.unequal(c,1)){
                 r += "+";
                 r += "(" + math.format(c, {format: "ratio"}) + ")";
-                if(math.smaller(c, 0)){
-                    m += "-";
-                }else{
-                    if(d!=s.length-1)
-                        m += "+";
-                }
-                if(c.d!=1)
-                    m += "\\frac{" + math.abs(c.n) + "}{" + math.abs(c.d) + "}";
-                else
+                if(math.isInteger(c))
                     m += math.abs(c.n);
+                else
+                    m += "\\frac{" + math.abs(c.n) + "}{" + math.abs(c.d) + "}";
             }else if(d==0){
                 r += "+1";
-                m += "+1";
+                m += "1";
             }
             if(d!=0){
                 r += "x";
@@ -321,8 +321,9 @@ function check(){
     while(types.firstChild){
         types.removeChild(types.firstChild);
     }
+    let t;
     if(points>0){
-        let t = document.createElement("input");
+        t = document.createElement("input");
         t.setAttribute("type", "radio");
         t.setAttribute("id", "polynomial");
         t.setAttribute("name", "type");
@@ -340,7 +341,7 @@ function check(){
         let p2 = p[1];
         
         if(math.equal(math.sign(p1.y), math.sign(p2.y))&&!math.equal(p1.y,0)&&!math.equal(p2.y,0)){
-            let t = document.createElement("input");
+            t = document.createElement("input");
             t.setAttribute("type", "radio");
             t.setAttribute("id", "exponential");
             t.setAttribute("name", "type");

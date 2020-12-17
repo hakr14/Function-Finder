@@ -28,3 +28,8 @@ body{
 .remove{
     margin-left: 4px;
 }
+#summary{
+    text-align: center;
+    font-size: 14pt;
+    color: #668;
+}
